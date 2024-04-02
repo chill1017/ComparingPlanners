@@ -8,8 +8,10 @@ setwd(" ")
 
 # Planner analysis function that takes:
 #   dataframes
-#   number of bootstrap iterations
+#   num.iters - number of bootstrap iterations
 #   rand - initial fit with random values?
+#   plot - plot residuals and simulated runtimes?
+#   clean.thresh - scrub data points with runtime less than this
 # and returns:
 # df with
 # m1, m2, m3, k values
