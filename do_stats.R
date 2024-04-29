@@ -1,5 +1,6 @@
-# version 4
+# v 4
 setwd(" ")
+
 
 # functions
 ###################################################################
@@ -8,10 +9,8 @@ setwd(" ")
 
 # Planner analysis function that takes:
 #   dataframes
-#   num.iters - number of bootstrap iterations
+#   number of bootstrap iterations
 #   rand - initial fit with random values?
-#   plot - plot residuals and simulated runtimes?
-#   clean.thresh - scrub data points with runtime less than this
 # and returns:
 # df with
 # m1, m2, m3, k values
@@ -28,7 +27,6 @@ SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, cl
   y2 <- dat.cgpo.clean$runtime
   y3 <- dat.cg.clean$runtime
   
-  # https://www.dataquest.io/blog/how-to-create-a-dataframe-in-r/
   output <- data.frame(
     matrix(rep(0,6*num.iters),
            nrow=num.iters,
@@ -57,8 +55,8 @@ SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, cl
   }else{
     init.vals <- runif(6,0.01,0.5)
   }
-
-
+  
+  
   # residual distributions
   y1.est <- m1.init*2^(k1.init*x1)
   y2.est <- m2.init*2^(k2.init*x2)
@@ -72,6 +70,16 @@ SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, cl
   sd1 <- sqrt(var(res1))
   sd2 <- sqrt(var(res2))
   sd3 <- sqrt(var(res3))
+  
+  # plot residuals for debugging
+  # plot(x1,exp(res1), col="blue", xlab="problem size", ylab="multiplicative deviation", main=paste("multiplicative residuals",domain_name))
+  # points(x2,exp(res2), col="red",add=TRUE )
+  # points(x3,exp(res3), col="green", add=TRUE )
+  # legend("topleft",
+  #        col=c("blue","red", "green"),
+  #        legend=c("ffpo", "cgpo", "cg"),
+  #        pch=c(1,1,1)
+  # )
   
   # printing residuals for debugging
   if(plot){
@@ -140,7 +148,7 @@ SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, cl
     for(i in 1:min(num.iters,100)){ simulation.plots[i] <- paste("./plots/simulated_data_",i,".pdf",sep="") }
     qpdf::pdf_combine(input=simulation.plots,
                       output=paste("./combined_plots/simulated-",domain_name,".pdf",sep="")
-                      )
+    )
   }
   return(output)
 }
@@ -196,9 +204,9 @@ get.dat <- function(path){
 ###################################################################
 ###################################################################
 domain_name <- "parking"
-p.ffpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_2/ffpo-parking.csv"
-p.cgpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_2/cgpo-parking.csv"
-p.cg <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_2/cg-parking.csv"
+p.ffpo <- " "
+p.cgpo <- " "
+p.cg <- " "
 dat.ffpo <- get.dat(p.ffpo)
 dat.cgpo <- get.dat(p.cgpo)
 dat.cg <- get.dat(p.cg)
@@ -215,9 +223,9 @@ rm(p.ffpo, p.cgpo, p.cg,i,x,rho1)
 
 
 domain_name <- "gripper"
-p.ffpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/ffpo-gripper.csv"
-p.cgpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/cgpo-gripper.csv"
-p.cg <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/cg-gripper.csv"
+p.ffpo <- " "
+p.cgpo <- " "
+p.cg <- " "
 dat.ffpo <- get.dat(p.ffpo)
 dat.cgpo <- get.dat(p.cgpo)
 dat.cg <- get.dat(p.cg)
@@ -228,9 +236,9 @@ rm(p.ffpo, p.cgpo, p.cg)
 
 
 domain_name <- "scanalyzer"
-p.ffpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/ffpo-scanalyzer.csv"
-p.cgpo <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/cgpo-scanalyzer.csv"
-p.cg <- "/Users/calebhill/Documents/UNH/MinorProject/code/planner_data/data_1/cg-scanalyzer.csv"
+p.ffpo <- " "
+p.cgpo <- " "
+p.cg <- " "
 dat.ffpo <- get.dat(p.ffpo)
 dat.cgpo <- get.dat(p.cgpo)
 dat.cg <- get.dat(p.cg)
@@ -338,10 +346,10 @@ ffpo.vs.cgpo.m <- rep(NA,30)
 cgpo.vs.cg.m <- rep(NA,30)
 cg.vs.ffpo.m <- rep(NA,30)
 for(i in 4:30){
-    stats.iter <- SimulStats(dat.ffpo=dat.ffpo[1:i,],
-                        dat.cg=dat.cg[1:i,],
-                        dat.cgpo=dat.cgpo[1:i,],
-                        num.iters=1000, rand=FALSE, clean.thresh=0.01, plot=FALSE)
+  stats.iter <- SimulStats(dat.ffpo=dat.ffpo[1:i,],
+                           dat.cg=dat.cg[1:i,],
+                           dat.cgpo=dat.cgpo[1:i,],
+                           num.iters=1000, rand=FALSE, clean.thresh=0.01, plot=FALSE)
   ffpo.vs.cgpo.k[i] <- ParamCompare(stats.iter$k.ffpo, stats.iter$k.cgpo)
   cgpo.vs.cg.k[i] <- ParamCompare(stats.iter$k.cgpo, stats.iter$k.cg)
   cg.vs.ffpo.k[i] <- ParamCompare(stats.iter$k.cg, stats.iter$k.ffpo)
@@ -395,9 +403,9 @@ ffpo.vs.cgpo.sign <- rep(NA,30)
 cgpo.vs.cg.sign <- rep(NA,30)
 cg.vs.ffpo.sign <- rep(NA,30)
 for(i in 1:30){
-    ffpo.vs.cgpo.sign[i] <- SIGN.test(dat.ffpo$runtime[1:i], dat.cgpo$runtime[1:i])$p.value[1]
-    cgpo.vs.cg.sign[i] <- SIGN.test(dat.cgpo$runtime[1:i], dat.cg$runtime[1:i])$p.value[1]
-    cg.vs.ffpo.sign[i] <- SIGN.test(dat.cg$runtime[1:i], dat.ffpo$runtime[1:i])$p.value[1]
+  ffpo.vs.cgpo.sign[i] <- SIGN.test(dat.ffpo$runtime[1:i], dat.cgpo$runtime[1:i])$p.value[1]
+  cgpo.vs.cg.sign[i] <- SIGN.test(dat.cgpo$runtime[1:i], dat.cg$runtime[1:i])$p.value[1]
+  cg.vs.ffpo.sign[i] <- SIGN.test(dat.cg$runtime[1:i], dat.ffpo$runtime[1:i])$p.value[1]
 }
 NonNAindex.ffpo.vs.cgpo.sign <- which(!is.na(ffpo.vs.cgpo.sign))
 lastNonNA.ffpo.vs.cgpo.sign <- max(NonNAindex.ffpo.vs.cgpo.sign)
@@ -464,10 +472,3 @@ param.path <- paste("./combined_plots/param_distr-",domain_name,".pdf",sep="")
 
 qpdf::pdf_combine(input=c(param.path, res.path, pwr, actual.runtime.path, sims.path),
                   output=paste("./combined_plots/report-",domain_name,".pdf",sep=""))
-
-
-
-
-
-
-
