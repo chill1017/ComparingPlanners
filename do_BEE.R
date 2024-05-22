@@ -1,6 +1,7 @@
 library(tidyverse)
 
 wd = "-- your wd here --"
+setwd(wd)
 
 # function that performs BEE
 SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, clean.thresh=0.5, plot=FALSE){
@@ -60,27 +61,25 @@ SimulStats <- function(dat.ffpo, dat.cgpo, dat.cg, num.iters=500, rand=FALSE, cl
   sd2 <- sqrt(var(res2))
   sd3 <- sqrt(var(res3))
   
-  # plot residuals for debugging
-  # plot(x1,exp(res1), col="blue", xlab="problem size", ylab="multiplicative deviation", main=paste("multiplicative residuals",domain_name))
-  # points(x2,exp(res2), col="red",add=TRUE )
-  # points(x3,exp(res3), col="green", add=TRUE )
-  # legend("topleft",
-  #        col=c("blue","red", "green"),
-  #        legend=c("ffpo", "cgpo", "cg"),
-  #        pch=c(1,1,1)
-  # )
   
-  # printing residuals for debugging
+  # printing residuals
   if(plot){
-    d1 <- density(res1)
-    d2 <- density(res2)
-    d3 <- density(res3)
-    x.range <- range(d1$x, d2$x, d3$x)
-    y.range <- range(d1$y, d2$y, d3$y)
+    r1 <- as.tibble(res1) %>% mutate(planner="ffpo", res=res1) %>% select(planner,res)
+    r2 <- as.tibble(res2) %>% mutate(planner="cgpo", res=res2) %>% select(planner,res)
+    r3 <- as.tibble(res3) %>% mutate(planner="cg", res=res3) %>% select(planner,res)
+    resids <- bind_rows(r1,r2,r3)
     pdf(paste("./plots/resid_plots-",domain_name,".pdf",sep=""))
-    plot(d1, col="blue", xlim=x.range, ylim=y.range, main=paste(domain_name, "residuals: ffpo"))
-    lines(d2,col="red", main=paste(domain_name, "residuals: cgpo"))
-    lines(d3,col="green", main=paste(domain_name, "residuals: cg"))
+    print(
+      ggplot(
+        data = resids,
+        mapping = aes(x=res, color = planner)
+      ) + geom_density(size=1.25, bw=0.0005) + 
+        labs(x="residual value", y="density") +
+        theme(legend.position = c(0.12,.8),
+              legend.text = element_text(size=10),
+              legend.title = element_text(size=10)
+        )
+    )
     dev.off()
   }
   
